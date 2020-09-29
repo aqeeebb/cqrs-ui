@@ -4,28 +4,30 @@
 @inject HttpClient Http
 
 <h1>Random Number Generator</h1>
-<EditForm Model="@req" OnValidSubmit="@HandleSubmit">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
+<hr/>
+    <button class="button" @onclick="() => keys = null">Clear Screen</button>
+<hr/>
+    <EditForm Model="@req" OnValidSubmit="@HandleHttpRequest">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
 
-    <p>
-        <label>
-            AES Api Uri:
-            <InputText @bind-Value="req.Uri" />
-        </label>
-        <label>
-            APIM Subscription Key:
-            <InputText @bind-Value="req.SubscriptionKey" />
-        </label>
-        <label>
-            Total Keys Requested:
-            <InputText @bind-Value="req.TotalKeys" />
-        </label>
-    </p>
+        <p>
+            <label>
+                AES Api Uri:
+                <InputText @bind-Value="req.Uri" />
+            </label>
+            <label>
+                APIM Subscription Key:
+                <InputText @bind-Value="req.SubscriptionKey" />
+            </label>
+            <label>
+                Total Keys Requested:
+                <InputText @bind-Value="req.TotalKeys" />
+            </label>
+        </p>
 
-    <button type="submit">Submit</button>
-</EditForm>
-
+        <button type="submit">Submit</button>
+    </EditForm>
 <hr/>
 
 @if (keys != null)
@@ -48,7 +50,7 @@
                         <td>@key.key</td>
                         <td>@key.writeRegion</td>
                         <td>@key.writeHost</td>
-                        <td>@key.timeStampUtc</td>
+                        <td>@key.timeStamp</td>
                     </tr>
                 }
             </tbody>
@@ -61,7 +63,7 @@
     private AesRequest req = new AesRequest();
     private List<AesKey> keys;
 
-    private async Task HandleSubmit()
+    private async Task HandleHttpRequest()
     {
         if( Uri.TryCreate( new Uri(req.Uri), $"/passwords/{req.TotalKeys}", out Uri uri) ) {
             var request = new HttpRequestMessage(HttpMethod.Post, uri);
@@ -78,26 +80,25 @@
 
     public class AesRequest {
         [Required]
-        public string   Uri              { get; set; }
+        public string Uri { get; set; }
 
         [Required]
-        public string   SubscriptionKey  { get; set; }
+        public string SubscriptionKey  { get; set; }
 
-        [Required]
         [Range(1, 1500, ErrorMessage = "Total number invalid (1-1500).")]
-        public string      TotalKeys        { get; set; }
+        public string TotalKeys { get; set; }
+
+        public string KeyId { get; set; }
     }
 
     public class AesKey {
-        private readonly DateTime _epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-
         public string   keyId       { get; set; }
-        public long     key         { get; set; }
+        public string   key         { get; set; }
         public string   readHost    { get; set; }
         public string   writeHost   { get; set; }
         public string   readRegion  { get; set; }
         public string   writeRegion { get; set; }
-        public long     timeStamp   { get; set; }
-        public DateTime timeStampUtc => _epoch.AddMilliseconds(timeStamp); 
+        public string   timeStamp   { get; set; }
+
     }
 }
