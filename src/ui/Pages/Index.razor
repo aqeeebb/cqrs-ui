@@ -1,0 +1,103 @@
+﻿@page "/"
+@using System;
+@using System.ComponentModel.DataAnnotations;
+@inject HttpClient Http
+
+<h1>Random Number Generator</h1>
+<EditForm Model="@req" OnValidSubmit="@HandleSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <p>
+        <label>
+            AES Api Uri:
+            <InputText @bind-Value="req.Uri" />
+        </label>
+        <label>
+            APIM Subscription Key:
+            <InputText @bind-Value="req.SubscriptionKey" />
+        </label>
+        <label>
+            Total Keys Requested:
+            <InputText @bind-Value="req.TotalKeys" />
+        </label>
+    </p>
+
+    <button type="submit">Submit</button>
+</EditForm>
+
+<hr/>
+
+@if (keys != null)
+{
+    <div class="table-responsive">
+        <table class="table table-hover table-striped">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Key</th>
+                    <th>Write Region</th>
+                    <th>Write Host</th>
+                    <th>Time Stamp</th>
+                </tr>
+
+            </thead>
+            <tbody>
+                @foreach (var key in keys)
+                {
+                    <tr>
+                        <td>@key.key</td>
+                        <td>@key.writeRegion</td>
+                        <td>@key.writeHost</td>
+                        <td>@key.timeStampUtc</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+@code {
+
+    private AesRequest req = new AesRequest();
+    private List<AesKey> keys;
+
+    private async Task HandleSubmit()
+    {
+        if( Uri.TryCreate( new Uri(req.Uri), $"/passwords/{req.TotalKeys}", out Uri uri) ) {
+            var request = new HttpRequestMessage(HttpMethod.Post, uri);
+            request.Headers.Add("Ocp-Apim-Subscription-Key", req.SubscriptionKey);
+        
+            var response = await Http.SendAsync(request);
+
+            if (response.IsSuccessStatusCode)
+            {  
+                keys = JsonSerializer.Deserialize<List<AesKey>>(await response.Content.ReadAsStringAsync());
+            }
+        }
+    }
+
+    public class AesRequest {
+        [Required]
+        public string   Uri              { get; set; }
+
+        [Required]
+        public string   SubscriptionKey  { get; set; }
+
+        [Required]
+        [Range(1, 1500, ErrorMessage = "Total number invalid (1-1500).")]
+        public string      TotalKeys        { get; set; }
+    }
+
+    public class AesKey {
+        private readonly DateTime _epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+
+        public string   keyId       { get; set; }
+        public long     key         { get; set; }
+        public string   readHost    { get; set; }
+        public string   writeHost   { get; set; }
+        public string   readRegion  { get; set; }
+        public string   writeRegion { get; set; }
+        public long     timeStamp   { get; set; }
+        public DateTime timeStampUtc => _epoch.AddMilliseconds(timeStamp); 
+    }
+}
