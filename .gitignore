@@ -255,6 +255,9 @@ _Pvt_Extensions
 .paket/paket.exe
 paket-files/
 
+# VS Code
+.vscode/
+
 # FAKE - F# Make
 .fake/
 
