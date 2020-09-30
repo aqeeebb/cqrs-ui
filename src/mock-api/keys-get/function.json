@@ -8,7 +8,7 @@
       "methods": [
         "get"
       ],
-      "route": "passwords/{keyId}"
+      "route": "keys/{keyId}"
     },
     {
       "type": "http",
