@@ -15,8 +15,6 @@ namespace cqrs_ui
         public static async Task Main(string[] args)
         {
             var builder = WebAssemblyHostBuilder.CreateDefault(args);
-
-            builder.Services.AddScoped(sp => new HttpClient {});
             builder.RootComponents.Add<App>("app");
             await builder.Build().RunAsync();
         }
