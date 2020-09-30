@@ -12,8 +12,8 @@ A very simple UI for the [CQRS AES Key API](https://github.com/briandenicola/cqr
 # Roadmap
 - [x] Create Mock API environment
 - [x] Simple Blazor UI deployed to Azure Static Web Apps
-- [ ] Automate Azure Static Web Apps infrastructure 
-- [ ] Automate deploy to Azure Static Web Apps
+- [ ] ~~Automate Azure Static Web Apps infrastructure~~
+- [x] Automate deploy to Azure Static Web Apps
 - [ ] Update code for SignalR with Blazor 
 - [ ] Migrate runtime to Azure SignalR service using Azure Cosmos Change Feed/Functions
 - [ ] Automate Azure SignalR infrastructure 
