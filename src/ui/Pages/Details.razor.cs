@@ -16,44 +16,19 @@ namespace cqrs_ui.pages {
 
         private Uri uri; 
 
-        [Inject]
-        protected HttpClient httpClient { get; set; }
 
         [Inject]
         protected KeyService req { get; set; }
 
         protected override async Task OnInitializedAsync()
         {
-            if( Uri.TryCreate( new Uri(req.Uri), $"{req.UriPath}/{id}", out uri) ) {
-                await SendRequest();
-            }
+            key = await req.SendGetRequest(id, String.Empty);
         }
 
         protected async Task HandleHttpRequest()
-        {
-            if( region != String.Empty ) {
-                var uriBuilder = new UriBuilder(uri);
-                var query = HttpUtility.ParseQueryString(uriBuilder.Query);
-                query["forcedRegion"] = region;
-                uriBuilder.Query = query.ToString();
-                uri = uriBuilder.Uri;         
-            }            
-
-            await SendRequest();
-        }
-
-        private async Task SendRequest()
-        {
-            var request = new HttpRequestMessage(HttpMethod.Get, uri);
-            request.Headers.Add("Ocp-Apim-Subscription-Key", req.SubscriptionKey);
-        
-            var response = await httpClient.SendAsync(request);
-
-            if (response.IsSuccessStatusCode)
-            {  
-                key = JsonSerializer.Deserialize<AesKey>(await response.Content.ReadAsStringAsync());
-            }  
-        }
+        { 
+            key = await req.SendGetRequest(id, region);
+        }                    
         
     }
 }

@@ -1,4 +1,4 @@
-using System.Net.Http;
+
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
@@ -13,7 +13,7 @@ namespace cqrs_ui
             var builder = WebAssemblyHostBuilder.CreateDefault(args);            
             builder.Services.AddSingleton<KeyService>();
             builder.RootComponents.Add<App>("app");
-            builder.Services.AddScoped(sp => new HttpClient() );
+            //builder.Services.AddScoped(sp => new KeyService() );
 
             var host = builder.Build();
             var req = host.Services.GetRequiredService<KeyService>();
